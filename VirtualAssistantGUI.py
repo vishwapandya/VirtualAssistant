@@ -111,4 +111,3 @@ if __name__ == "__main__":
     ui.setupUi(ARVA_VISHTI)
     ARVA_VISHTI.show()
     sys.exit(app.exec_())
-
