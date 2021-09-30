@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_ARVA_VISHTI(object):
     def setupUi(self, ARVA_VISHTI):
         ARVA_VISHTI.setObjectName("ARVA_VISHTI")
@@ -42,6 +43,7 @@ class Ui_ARVA_VISHTI(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(550, 50, 100, 100))
+        self.pushButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pushButton.setStyleSheet("background-color: transparent")
         self.pushButton.setText("")
         icon1 = QtGui.QIcon()
@@ -62,21 +64,21 @@ class Ui_ARVA_VISHTI(object):
         self.label_4.setScaledContents(True)
         self.label_4.setObjectName("label_4")
         self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser.setGeometry(QtCore.QRect(850, 20, 100, 40))
+        self.textBrowser.setGeometry(QtCore.QRect(790, 30, 200, 60))
         self.textBrowser.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.textBrowser.setStyleSheet("background-color: transparent;\n"
 "color: black;\n"
-"font-size: 20px;\n"
-"font-family: \"SketchFlow Print\";\n"
+"font-size: 28px;\n"
+"font-family: \"Algerian\";\n"
 "text-align:right;\n"
 "border: none;")
         self.textBrowser.setObjectName("textBrowser")
         self.textBrowser_2 = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser_2.setGeometry(QtCore.QRect(650, 20, 200, 40))
+        self.textBrowser_2.setGeometry(QtCore.QRect(80, 30, 200, 60))
         self.textBrowser_2.setStyleSheet("background-color: transparent;\n"
 "color: black;\n"
-"font-size: 20px;\n"
-"font-family: \"SketchFlow Print\";\n"
+"font-size: 28px;\n"
+"font-family: \"Algerian\";\n"
 "text-align:right;\n"
 "border: none;")
         self.textBrowser_2.setObjectName("textBrowser_2")
@@ -94,12 +96,12 @@ class Ui_ARVA_VISHTI(object):
         self.textBrowser.setHtml(_translate("ARVA_VISHTI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SketchFlow Print\'; font-size:20px; font-weight:400; font-style:normal;\">\n"
+"</style></head><body style=\" font-family:\'Algerian\'; font-size:28px; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.textBrowser_2.setHtml(_translate("ARVA_VISHTI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SketchFlow Print\'; font-size:20px; font-weight:400; font-style:normal;\">\n"
+"</style></head><body style=\" font-family:\'Algerian\'; font-size:28px; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
 
 

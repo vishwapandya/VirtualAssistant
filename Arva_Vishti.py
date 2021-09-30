@@ -45,6 +45,37 @@ voices = engine.getProperty('voices')
 engine.setProperty('voice',voices[1].id)
 engine.setProperty('rate',175)
 
+class InputText(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.title = 'PyQt5 button'
+        self.left = 10
+        self.top = 10
+        self.width = 320
+        self.height = 200
+        self.initUI()
+    
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.inputBox = QLineEdit(self)
+        self.inputBox.move(20,80)
+        self.inputBox.resize(200,40)
+        self.button = QPushButton('Show Text', self)
+        self.button.move(20,120)
+        self.button.clicked.connect(self.on_click)        
+        self.show()
+
+    @pyqtSlot()
+    def on_click(self):
+        # print('PyQt5 button click')
+        textBoxValue = self.inputBox.text()
+        return textBoxValue
+        # QMessageBox.question(self,"Message","You Typed: "+textBoxValue,QMessageBox.Ok,QMessageBox.Ok)
+
+        # self.inputBox.setText("")
+
 def try_finding_chrome_path():
     result = None
     if winreg:
@@ -459,11 +490,14 @@ class MainThread(QThread):
                     if userResponse == "yes" or userResponse == "yeah" or userResponse == "ya":
                         speak("what message has to be sent?")
                         msg = input("Enter message here...")
+                        #msg = InputText()
+                        #msg = self.lineditname.text()
                         now = dt.datetime.now()
                         h = now.hour
-                        m = now.minute + 1
-                        pywhatkit.sendwhatmsg(num,msg,h,m,2)
+                        m = now.minute + 2
+                        pywhatkit.sendwhatmsg(num,msg,h,m)
                         speak("Message sent successfully.")
+
                     else:
                         speak("Okay! I'll not send the message")
 
@@ -697,7 +731,7 @@ class Main(QMainWindow):
         currentTime = QTime.currentTime()
         now = QDate.currentDate()
         time = currentTime.toString("hh:mm:ss")
-        date = now.toString(Qt.ISODate)
+        date = now.toString(Qt.DefaultLocaleShortDate)
         self.ui.textBrowser_2.setText(date)
         self.ui.textBrowser.setText(time)
 

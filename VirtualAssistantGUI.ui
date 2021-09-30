@@ -154,10 +154,10 @@
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>850</x>
-      <y>20</y>
-      <width>100</width>
-      <height>40</height>
+      <x>800</x>
+      <y>30</y>
+      <width>200</width>
+      <height>60</height>
      </rect>
     </property>
     <property name="layoutDirection">
@@ -182,10 +182,10 @@ p, li { white-space: pre-wrap; }
    <widget class="QTextBrowser" name="textBrowser_2">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>20</y>
+      <x>100</x>
+      <y>30</y>
       <width>200</width>
-      <height>40</height>
+      <height>60</height>
      </rect>
     </property>
     <property name="styleSheet">
