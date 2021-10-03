@@ -10,7 +10,7 @@ from requests import get
 import wikipedia
 import webbrowser
 import pywhatkit
-import keyboard as k #pip install keyboard
+#import keyboard as k #pip install keyboard
 import smtplib
 import sys
 import time
@@ -28,10 +28,11 @@ from pytube import YouTube #pip install pytube3  #if any error python -m pip ins
 import pywikihow #pip install pywikihow
 from pywikihow import search_wikihow
 from pywikihow import WikiHow
-from twilio.rest import Client #pip install twilio
+#from twilio.rest import Client #pip install twilio
 import math
 import string
 from ctypes import windll
+import tkinter
 
 #for GUI
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -51,36 +52,25 @@ voices = engine.getProperty('voices')
 engine.setProperty('voice',voices[1].id)
 engine.setProperty('rate',175)
 
-class InputText(QWidget):
+class ButtonEntry():
+    def __init__(self, root):
+        self.entry_var=""
 
-    def __init__(self):
-        super().__init__()
-        self.title = 'PyQt5 button'
-        self.left = 10
-        self.top = 10
-        self.width = 320
-        self.height = 200
-        self.initUI()
-    
-    def initUI(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        self.inputBox = QLineEdit(self)
-        self.inputBox.move(20,80)
-        self.inputBox.resize(200,40)
-        self.button = QPushButton('Show Text', self)
-        self.button.move(20,120)
-        self.button.clicked.connect(self.on_click)        
-        self.show()
+        startLabel =tkinter.Label(root,text="Enter here: ")
+        self.startEntry=tkinter.Entry(root)
 
-    @pyqtSlot()
-    def on_click(self):
-        # print('PyQt5 button click')
-        textBoxValue = self.inputBox.text()
-        return textBoxValue
-        # QMessageBox.question(self,"Message","You Typed: "+textBoxValue,QMessageBox.Ok,QMessageBox.Ok)
+        startLabel.pack()
+        self.startEntry.pack()
+        self.startEntry.focus_set()
 
-        # self.inputBox.setText("")
+        plotButton= tkinter.Button(root,text="Press to save ",command=self.msgSend).pack()
+
+    def msgSend(self):
+        self.entry_var=self.startEntry.get()
+        #print("inside class", self.entry_var)
+        global resultForMsg
+        resultForMsg = self.entry_var
+        return resultForMsg
 
 def try_finding_chrome_path():
     result = None
@@ -530,13 +520,15 @@ class MainThread(QThread):
                     userResponse = self.take_command().lower()
                     if "yes" in userResponse or "yeah" in userResponse or "ya" in userResponse:
                         speak("what message has to be sent?")
-                        msg = input("Enter message here...")
-                        #msg = InputText()
-                        #msg = self.lineditname.text()
+                        root=tkinter.Tk()
+                        root.geometry("400x240")
+                        BE=ButtonEntry(root)    
+                        root.mainloop()
+                        msg = resultForMsg
                         now = dt.datetime.now()
                         h = now.hour
                         m = now.minute + 2
-                        pywhatkit.sendwhatmsg(num,msg,h,m)
+                        pywhatkit.sendwhatmsg(num,msg,h,m,20)
                         #pyautogui.press("enter")
                         # pyautogui.click(1050, 950)
                         # time.sleep(2)
@@ -548,26 +540,42 @@ class MainThread(QThread):
 
                 elif "send email" in self.query:
                     try:
-                        def_email = "aartiagarwal197@gmail.com"
-                        def_pwd = "pwd"
+                        def_email = "vishwapandya1999@gmail.com"
+                        def_pwd = "@vishwaPandya1999@"
                         speak(f"Do you want to send message through {def_email} ?")
                         response = self.take_command().lower()
                         if "yes" in response:
                             speak("Provide me with the receiver's email address:")
-                            to = input("Enter the receiver's email address:")
+                            root=tkinter.Tk()
+                            root.geometry("400x240")
+                            BE=ButtonEntry(root)    
+                            root.mainloop()
+                            to = resultForMsg
                             speak(f"What do you want to send to {to} ?")
                             content = self.take_command().lower()
                             sendEmail(def_email,def_pwd,to,content)
                         elif "no" in response:
                             speak("Can you please guide me to login your email...")
                             speak("Provide me with the sender's email address:")
-                            sender_id = input("Enter the sender's email address:")
+                            root=tkinter.Tk()
+                            root.geometry("400x240")
+                            BE=ButtonEntry(root)    
+                            root.mainloop()
+                            sender_id = resultForMsg
                             speak("Provide me with the sender's password for login:")
-                            sender_pwd = input("Enter the sender's password:")
+                            root=tkinter.Tk()
+                            root.geometry("400x240")
+                            BE=ButtonEntry(root)    
+                            root.mainloop()
+                            sender_pwd = resultForMsg
                             speak(f"What do you want to send to {to} ?")
                             content = self.take_command().lower()
                             speak("Provide me with the receiver's email address:")
-                            to = input("Enter the receiver's email address:")
+                            root=tkinter.Tk()
+                            root.geometry("400x240")
+                            BE=ButtonEntry(root)    
+                            root.mainloop()
+                            to = resultForMsg
                             speak(f"What do you want to send to {to} ?")
                             content = self.take_command().lower()
                             sendEmail(sender_id,sender_pwd,to,content)
@@ -704,14 +712,22 @@ class MainThread(QThread):
 
                 elif "download video" in self.query:
                     speak("Provide me the youtube link...")
-                    url = input("Enter link here:")
+                    root=tkinter.Tk()
+                    root.geometry("400x240")
+                    BE=ButtonEntry(root)    
+                    root.mainloop()
+                    url = resultForMsg
                     speak("Downloading, please wait, this might take a few minutes")
                     YouTube(url).streams.get_highest_resolution().download()
                     speak("Download completed.")
 
                 elif "search a file" in self.query or "open a file" in self.query:
                     isFound = False
-                    search = input("Enter file name: ")
+                    root=tkinter.Tk()
+                    root.geometry("400x240")
+                    BE=ButtonEntry(root)    
+                    root.mainloop()
+                    search = resultForMsg
                     drives = []
                     bitmask = windll.kernel32.GetLogicalDrives()
                     for letter in string.ascii_uppercase:
