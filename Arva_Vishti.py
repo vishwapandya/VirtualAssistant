@@ -10,6 +10,7 @@ from requests import get
 import wikipedia
 import webbrowser
 import pywhatkit
+import keyboard as k #pip install keyboard
 import smtplib
 import sys
 import time
@@ -28,6 +29,9 @@ import pywikihow #pip install pywikihow
 from pywikihow import search_wikihow
 from pywikihow import WikiHow
 from twilio.rest import Client #pip install twilio
+import math
+import string
+from ctypes import windll
 
 #for GUI
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -38,6 +42,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUiType
 from VirtualAssistantGUI import Ui_ARVA_VISHTI
+
+
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -112,19 +118,24 @@ def selectGender():
 
     try:
         print("Recognizing...")
-        gender = r.recognize_google(audio, language='en-in')
+        global gender
+        gender = r.recognize_google(audio, language='en-in').lower()
         print(f"User Said: {gender}")
     
     except Exception as e:
         speak("say that again please...")
-        translateSentence()
+        selectGender()
     
     print(gender)
+    # global gen
+    # gen = 0
     if gender=="arva" or gender=="arwa" or gender=="Arwa" or gender=="Arva" or gender=="are vah" or gender=="are wah" or gender=="Are vah" or gender=="Are wah":
-        engine.setProperty('voice',voices[0].id)
+        engine.setProperty('voice',voices[0].id)  
+        #gen=0
         speak("I am Arva, how may I assist you?")
-    elif gender=="vishti" or gender=="Vishti" or gender=="misty" or gender=="Misty" or gender=="srishti" or gender=="drishti":
+    elif gender=="vishti" or gender=="Vishti" or gender=="misty" or gender=="Misty" or gender=="srishti" or gender=="drishti" or gender=="visti" or gender=="bishti" or gender=="bisti" or gender=="bishty":
         engine.setProperty('voice',voices[1].id)
+        #gen=1
         speak("I am Vishti, how may I assist you?")
     else:
         speak("Can you please repeat")
@@ -178,6 +189,24 @@ def sub(a,b):
 def mul(a,b):
     return a*b
 
+def divide(a,b):
+    return a/b
+
+def power(a,b):
+    return a**b
+
+def sin(a):
+    ans = math.sin((math.pi/180)*a)
+    return round(ans,3)
+
+def cos(a):
+    ans = math.cos((math.pi/180)*a)
+    return round(ans,3)
+
+def tan(a):
+    ans = math.tan((math.pi/180)*a)
+    return round(ans,3)
+
 def remove(str):
     return str.replace(" ", "")
 
@@ -228,6 +257,18 @@ def translateSentence():
         isAvailable = True
     elif "hindi" in lang:
         l = "hi"
+        isAvailable = True
+    elif "chinese" in lang:
+        l = "zh-tw"
+        isAvailable = True
+    elif "portuguese" in lang:
+        l = "pt"
+        isAvailable = True
+    elif "italian" in lang:
+        l = "it"
+        isAvailable = True
+    elif "japanese" in lang:
+        l = "ja"
         isAvailable = True
     if isAvailable==True:
         translated = translator.translate(text,src='en',dest=l)
@@ -487,7 +528,7 @@ class MainThread(QThread):
                     num = cnt_code + self.take_command()
                     speak(f"Please confirm the number: {num}")
                     userResponse = self.take_command().lower()
-                    if userResponse == "yes" or userResponse == "yeah" or userResponse == "ya":
+                    if "yes" in userResponse or "yeah" in userResponse or "ya" in userResponse:
                         speak("what message has to be sent?")
                         msg = input("Enter message here...")
                         #msg = InputText()
@@ -496,6 +537,10 @@ class MainThread(QThread):
                         h = now.hour
                         m = now.minute + 2
                         pywhatkit.sendwhatmsg(num,msg,h,m)
+                        #pyautogui.press("enter")
+                        # pyautogui.click(1050, 950)
+                        # time.sleep(2)
+                        #k.press_and_release('enter')
                         speak("Message sent successfully.")
 
                     else:
@@ -541,12 +586,13 @@ class MainThread(QThread):
                         if not ret:
                             print("failed to grab frame")
                             break
-                        cv2.imshow("test", frame)
+                        cv2.imshow("camera", frame)
 
                         k = cv2.waitKey(1)
                         if k%256 == 27:
                             # ESC pressed
                             print("Escape hit, closing...")
+                            #cam.destroyAllWindows()
                             break
                         elif k%256 == 32:
                             # SPACE pressed
@@ -555,7 +601,7 @@ class MainThread(QThread):
                             print("{} written!".format(img_name))
                             img_counter += 1
                     cam.release()
-                    cam.destroyAllWindows()
+                    # cam.destroyAllWindows()
 
                 elif "temperature" in self.query:
                     speak("which place' temperature would you like to know?")
@@ -594,7 +640,7 @@ class MainThread(QThread):
                     else :
                         speak("Sorry couldn't understand you!")
         
-                elif "do some calculations" in self.query or "can you calculate" in self.query:
+                elif "do some calculations" in self.query or "can you calculate" in self.query or "do some calculation" in self.query or "calculator" in self.query:
                     r = sr.Recognizer()
                     with sr.Microphone() as source:
                         speak("What do you want to calculate?")
@@ -602,18 +648,28 @@ class MainThread(QThread):
                         audio = r.listen(source)
                         my_string = r.recognize_google(audio)
                         print(my_string)
-                        def getOperator(opr):
-                            return{
-                                "+": add,
-                                "-": sub,
-                                "x": mul,
-                                #"divided": operator.__truediv__,
-                            }[opr]
-                        def EvaluateExpression(op1,opr,op2):
-                            op1,op2 = int(op1), int(op2)
-                            return getOperator(opr)(op1,op2)
-                        speak("The answer is: ")
-                        speak(EvaluateExpression(*(my_string.split())))
+                        if "cos" in my_string:
+                            #cos 10
+                            num = 0
+                            number = f'{num}'
+                            print(number)
+                            ans = cos(number)
+                            speak(ans)
+                        else:
+                            def getOperator(opr):
+                                return{
+                                    "+": add,
+                                    "-": sub,
+                                    "x": mul,
+                                    "divided": divide,
+                                    "/": divide,
+                                    "power": power
+                                }[opr]
+                            def EvaluateExpression(op1,opr,op2):
+                                op1,op2 = int(op1), int(op2)
+                                return getOperator(opr)(op1,op2)
+                            speak("The answer is: ")
+                            speak(EvaluateExpression(*(my_string.split())))
 
                 elif "battery" in self.query or "how much power left" in self.query:
                     battery = checkBattery()
@@ -655,51 +711,39 @@ class MainThread(QThread):
 
                 elif "search a file" in self.query or "open a file" in self.query:
                     isFound = False
-                    listing1 = os.walk("C:/")
-                    listing2 = os.walk("D:/")
-                    listing3 = os.walk("E:/")
-                    listing4 = os.walk("F:/")
-                    search = input("Enter file name:")
+                    search = input("Enter file name: ")
+                    drives = []
+                    bitmask = windll.kernel32.GetLogicalDrives()
+                    for letter in string.ascii_uppercase:
+                        if bitmask & 1:
+                            drives.append(letter)
+                            print(letter)
+                            if letter!="c" and letter!="C":
+                                listing1 = os.walk(letter+":/")
+                                if isFound == False:
+                                    print("Searching in "+letter+" drive")
+                                    for root, dir, files in listing1:
+                                        if search in files:
+                                            print(os.path.join(root,search))
+                                            os.startfile(os.path.join(root,search))
+                                            isFound = True
+                                            break
+                                    if isFound == False:
+                                        print(search + " not found in "+letter+" drive")
+                        bitmask >>= 1
 
-                    if isFound == False:
-                        speak(f"Searching {search} in D: drive")
-                        for root, dir, files in listing2:
-                            if search in files:
-                                print(os.path.join(root,search))
-                                os.startfile(os.path.join(root,search)) #opening the file
-                                isFound = True
-                        if isFound == False:
-                            speak(f"{search} not found in D drive")
-
-                    if isFound == False:
-                        speak(f"Searching {search} in E: drive")
-                        for root, dir, files in listing3:
-                            if search in files:
-                                print(os.path.join(root,search))
-                                os.startfile(os.path.join(root,search))
-                                isFound = True
-                        if isFound == False:
-                            speak(f"{search} not found in E drive")
-
-                    if isFound == False:
-                        speak(f"Searching {search} in F: drive")
-                        for root, dir, files in listing4:
-                            if search in files:
-                                print(os.path.join(root,search))
-                                os.startfile(os.path.join(root,search))
-                                isFound = True
-                        if isFound == False:
-                            speak(f"{search} not found in F drive")
-
-                    if isFound == False:
-                        speak(f"Searching {search} in C: drive")
-                        for root, dir, files in listing1:
-                            if search in files:
-                                print(os.path.join(root,search))
-                                os.startfile(os.path.join(root,search))
-                                isFound = True
-                        if isFound == False:
-                            speak(f"{search} not found in C drive")
+                # elif "talk to are vah" in self.query or "talk to misty" in self.query or "change gender" in self.query or "bored talking to you" in self.query:
+                #     #print(gen)
+                #     g=0
+                #     g = gen
+                #     if g==0:
+                #         engine.setProperty('voice',voices[1].id)
+                #         speak("Changing Arva to Vishti")
+                #         gen=1
+                #     elif g==1:
+                #         engine.setProperty('voice',voices[0].id)
+                #         speak("Changing Vishti to Arva")
+                #         gen=0
 
                 elif "no" in self.query:
                     speak("Thank you for using me, have a great day ahead...")                
