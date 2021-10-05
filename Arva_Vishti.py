@@ -1,4 +1,3 @@
-from math import fabs
 from posixpath import pathsep
 import pyttsx3
 import speech_recognition as sr
@@ -10,13 +9,14 @@ from requests import get
 import wikipedia
 import webbrowser
 import pywhatkit
-#import keyboard as k #pip install keyboard
+import keyboard as k #pip install keyboard
 import smtplib
 import sys
 import time
 import requests 
 from bs4 import BeautifulSoup #pip install bs4
 import winsound #pip install Playsound
+from playsound import playsound
 from tkinter import * #inbuilt
 import psutil #pip install psutil 
 import speedtest #pip install speedtest-cli
@@ -28,11 +28,13 @@ from pytube import YouTube #pip install pytube3  #if any error python -m pip ins
 import pywikihow #pip install pywikihow
 from pywikihow import search_wikihow
 from pywikihow import WikiHow
-#from twilio.rest import Client #pip install twilio
 import math
 import string
 from ctypes import windll
 import tkinter
+import ctypes
+import winshell #pip install winshell
+import subprocess
 
 #for GUI
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -43,8 +45,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUiType
 from VirtualAssistantGUI import Ui_ARVA_VISHTI
-
-
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -117,15 +117,15 @@ def selectGender():
         selectGender()
     
     print(gender)
-    # global gen
-    # gen = 0
-    if gender=="arva" or gender=="arwa" or gender=="Arwa" or gender=="Arva" or gender=="are vah" or gender=="are wah" or gender=="Are vah" or gender=="Are wah":
+    global gen
+    gen = 0
+    if gender=="0" or gender=="arwa" or gender=="Arwa" or gender=="Arva" or gender=="are vah" or gender=="are wah" or gender=="Are vah" or gender=="Are wah":
         engine.setProperty('voice',voices[0].id)  
-        #gen=0
+        gen=0
         speak("I am Arva, how may I assist you?")
     elif gender=="vishti" or gender=="Vishti" or gender=="misty" or gender=="Misty" or gender=="srishti" or gender=="drishti" or gender=="visti" or gender=="bishti" or gender=="bisti" or gender=="bishty":
         engine.setProperty('voice',voices[1].id)
-        #gen=1
+        gen=1
         speak("I am Vishti, how may I assist you?")
     else:
         speak("Can you please repeat")
@@ -185,18 +185,6 @@ def divide(a,b):
 def power(a,b):
     return a**b
 
-def sin(a):
-    ans = math.sin((math.pi/180)*a)
-    return round(ans,3)
-
-def cos(a):
-    ans = math.cos((math.pi/180)*a)
-    return round(ans,3)
-
-def tan(a):
-    ans = math.tan((math.pi/180)*a)
-    return round(ans,3)
-
 def remove(str):
     return str.replace(" ", "")
 
@@ -211,7 +199,7 @@ def translateSentence():
 
     try:
         print("Recognizing...")
-        lang = r.recognize_google(audio, language='en-in')
+        lang = r.recognize_google(audio, language='en-in').lower()
         print(f"User Said: {lang}")
     
     except Exception as e:
@@ -288,8 +276,6 @@ def alarm(timeforalarm):
                 break
 
 def startGame():
-
-
     boardWidth = 30
     boardHeight = 30
     tilesize = 10
@@ -449,6 +435,7 @@ class MainThread(QThread):
             print(f"User Said: {query}")
         
         except Exception as e:
+            print(e)
             speak("say that again please...")
             return self.take_command()
         return query
@@ -464,84 +451,158 @@ class MainThread(QThread):
                 self.query = self.take_command().lower()
 
                 if "open notepad" in self.query:
-                    notepad = 'notepad'
-                    os.system(notepad)
+                    try:
+                        notepad = 'notepad'
+                        os.system(notepad)
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "open command prompt" in self.query:
-                    os.system("start cmd")
-
-                elif "play music" in self.query:
-                    music_dir = "D:\\songs"
-                    songs = os.listdir(music_dir)
-                    #rd = random.choice(songs)
-                    for song in songs:
-                        if song.endswith('.mp3'):
-                            os.startfile(os.path.join(music_dir,song))
+                    try:
+                        os.system("start cmd")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "ip address" in self.query:
-                    ip = get('https://api.ipify.org').text
-                    speak(f"Your IP address is {ip}")
+                    try:
+                        ip = get('https://api.ipify.org').text
+                        speak(f"Your IP address is {ip}")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "wikipedia" in self.query:
-                    speak("Searching Wikipedia...")
-                    self.query = self.query.replace("wikipedia","")
-                    results = wikipedia.summary(self.query,sentences=5)
-                    speak("According to wikipedia,")
-                    speak(results)
-                    #print(results)
+                    try:
+                        speak("Searching Wikipedia...")
+                        self.query = self.query.replace("wikipedia","")
+                        results = wikipedia.summary(self.query,sentences=5)
+                        speak("According to wikipedia,")
+                        speak(results)
+                        #print(results)
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "open youtube" in self.query:
-                    #webbrowser.open("www.youtube.com")
-                    speak("what shall I play on youtube?")
-                    song = self.take_command()
-                    speak(f'playing {song} for you')
-                    pywhatkit.playonyt(song)
-                    sys.exit()
+                    try:
+                        #webbrowser.open("www.youtube.com")
+                        speak("what shall I play on youtube?")
+                        song = self.take_command()
+                        speak(f'playing {song} for you')
+                        pywhatkit.playonyt(song)
+                        sys.exit()
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "open facebook" in self.query:
-                    path = try_finding_chrome_path()
-                    path = path.replace(os.sep,'/')
-                    path = f'{path} %s'
-                    webbrowser.get(path).open("www.facebook.com")
+                    try:
+                        path = try_finding_chrome_path()
+                        path = path.replace(os.sep,'/')
+                        path = f'{path} %s'
+                        webbrowser.get(path).open("www.facebook.com")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "open google" in self.query:
-                    speak("What should I search on google for you?")
-                    cm = self.take_command().lower()
-                    path = try_finding_chrome_path()
-                    path = path.replace(os.sep,'/')
-                    path = f'{path} %s'
-                    webbrowser.get(path).open(f"https://www.google.com/search?q={cm}")
+                    try:
+                        speak("What should I search on google for you?")
+                        cm = self.take_command().lower()
+                        path = try_finding_chrome_path()
+                        path = path.replace(os.sep,'/')
+                        path = f'{path} %s'
+                        webbrowser.get(path).open(f"https://www.google.com/search?q={cm}")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
+
+                elif 'open stackoverflow' in self.query or 'open stack overflow' in self.query:
+                    try:
+                        speak("Here you go to Stack Over flow.Happy coding")
+                        path = try_finding_chrome_path()
+                        path = path.replace(os.sep,'/')
+                        path = f'{path} %s'
+                        webbrowser.get(path).open("stackoverflow.com")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
+
+                elif 'the time' in self.query:
+                    try:
+                        strTime = dt.datetime.now().strftime("%H:%M:%S")   
+                        speak(f"The time is {strTime}")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
+
+                elif 'change background' in self.query:
+                    #path to be given in this format C:\Users\HP\Pictures\Saved Pictures\download.jpg
+                    root=tkinter.Tk()
+                    root.geometry("400x240")
+                    BE=ButtonEntry(root)    
+                    root.mainloop()
+                    pic = resultForMsg
+                    ctypes.windll.user32.SystemParametersInfoW(20,0,pic,0)
+                    speak("Background changed successfully")
+
+                elif 'lock window' in self.query:
+                    speak("locking the device")
+                    ctypes.windll.user32.LockWorkStation()
+ 
+                elif 'shutdown system' in self.query:
+                    speak("Hold On a Sec ! Your system is on its way to shut down")
+                    os.system("shutdown /s /t 30")
+                                     
+                elif 'empty recycle bin' in self.query:
+                    winshell.recycle_bin().empty(confirm = False, show_progress = False, sound = True)
+                    speak("Recycle Bin Recycled")
+ 
+                elif "don't listen" in self.query or "stop listening" in self.query:
+                    speak("for how much time you want to stop jarvis from listening commands")
+                    a = int(self.take_command())
+                    time.sleep(a)
+                    print(a)
+
+                elif "write a note" in self.query:
+                    speak("What should i write?")
+                    note = self.take_command()
+                    file = open('note to self.txt', 'w')
+                    speak("Should i include date and time?")
+                    response = self.take_command()
+                    if 'yes' in response or 'sure' in response or 'yeah' in response:
+                        strTime = dt.datetime.now().strftime("%H:%M:%S")
+                        file.write(strTime)
+                        file.write(" :- ")
+                        file.write(note)
+                    else:
+                        file.write(note)
 
                 elif "send message" in self.query:
-                    speak("Tell me the number of the receiver")
-                    cnt_code = "+91"
-                    num = cnt_code + self.take_command()
-                    speak(f"Please confirm the number: {num}")
-                    userResponse = self.take_command().lower()
-                    if "yes" in userResponse or "yeah" in userResponse or "ya" in userResponse:
-                        speak("what message has to be sent?")
-                        root=tkinter.Tk()
-                        root.geometry("400x240")
-                        BE=ButtonEntry(root)    
-                        root.mainloop()
-                        msg = resultForMsg
-                        now = dt.datetime.now()
-                        h = now.hour
-                        m = now.minute + 2
-                        pywhatkit.sendwhatmsg(num,msg,h,m,20)
-                        #pyautogui.press("enter")
-                        # pyautogui.click(1050, 950)
-                        # time.sleep(2)
-                        #k.press_and_release('enter')
-                        speak("Message sent successfully.")
-
-                    else:
-                        speak("Okay! I'll not send the message")
+                    try:
+                        speak("Tell me the number of the receiver")
+                        cnt_code = "+91"
+                        num = cnt_code + self.take_command()
+                        speak(f"Please confirm the number: {num}")
+                        userResponse = self.take_command().lower()
+                        if "yes" in userResponse or "yeah" in userResponse or "ya" in userResponse:
+                            speak("what message has to be sent?")
+                            root=tkinter.Tk()
+                            root.geometry("400x240")
+                            BE=ButtonEntry(root)    
+                            root.mainloop()
+                            msg = resultForMsg
+                            now = dt.datetime.now()
+                            h = now.hour
+                            m = now.minute + 2
+                            pywhatkit.sendwhatmsg(num,msg,h,m,20)
+                            #pyautogui.press("enter")
+                            #pyautogui.click(1050, 950)
+                            # time.sleep(2)
+                            k.press_and_release('enter')
+                            speak("Message sent successfully.")
+                        else:
+                            speak("Okay! I'll not send the message")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "send email" in self.query:
                     try:
-                        def_email = "vishwapandya1999@gmail.com"
-                        def_pwd = "@vishwaPandya1999@"
+                        def_email = "aartiagarwal197@gmail.com"
+                        def_pwd = "pwd"
                         speak(f"Do you want to send message through {def_email} ?")
                         response = self.take_command().lower()
                         if "yes" in response:
@@ -556,13 +617,13 @@ class MainThread(QThread):
                             sendEmail(def_email,def_pwd,to,content)
                         elif "no" in response:
                             speak("Can you please guide me to login your email...")
-                            speak("Provide me with the sender's email address:")
+                            speak("Provide me with the your email address:")
                             root=tkinter.Tk()
                             root.geometry("400x240")
-                            BE=ButtonEntry(root)    
+                            BE=ButtonEntry(root)
                             root.mainloop()
                             sender_id = resultForMsg
-                            speak("Provide me with the sender's password for login:")
+                            speak("Provide me with the your password for login:")
                             root=tkinter.Tk()
                             root.geometry("400x240")
                             BE=ButtonEntry(root)    
@@ -586,84 +647,91 @@ class MainThread(QThread):
                         print(e)
 
                 elif "open camera" in self.query:
-                    cam = cv2.VideoCapture(0)
-                    cv2.namedWindow("camera")
-                    img_counter = 0
-                    while True:
-                        ret, frame = cam.read()
-                        if not ret:
-                            print("failed to grab frame")
-                            break
-                        cv2.imshow("camera", frame)
+                    try:
+                        cam = cv2.VideoCapture(0)
+                        cv2.namedWindow("camera")
+                        img_counter = 0
+                        while True:
+                            ret, frame = cam.read()
+                            if not ret:
+                                print("failed to grab frame")
+                                break
+                            cv2.imshow("camera", frame)
 
-                        k = cv2.waitKey(1)
-                        if k%256 == 27:
-                            # ESC pressed
-                            print("Escape hit, closing...")
-                            #cam.destroyAllWindows()
-                            break
-                        elif k%256 == 32:
-                            # SPACE pressed
-                            img_name = "opencv_frame_{}.png".format(img_counter)
-                            cv2.imwrite(img_name, frame)
-                            print("{} written!".format(img_name))
-                            img_counter += 1
-                    cam.release()
-                    # cam.destroyAllWindows()
+                            k = cv2.waitKey(1)
+                            if k%256 == 27:
+                                # ESC pressed
+                                print("Escape hit, closing...")
+                                #cam.destroyAllWindows()
+                                break
+                            elif k%256 == 32:
+                                # SPACE pressed
+                                img_name = "opencv_frame_{}.png".format(img_counter)
+                                cv2.imwrite(img_name, frame)
+                                print("{} written!".format(img_name))
+                                img_counter += 1
+                        cam.release()
+                        cam.destroyAllWindows()
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "temperature" in self.query:
-                    speak("which place' temperature would you like to know?")
-                    place = self.take_command().lower()
-                    search = "Temperature in " + place
-                    url = f'https://www.google.com/search?q={search}'
-                    r = requests.get(url)
-                    data = BeautifulSoup(r.text,"html.parser")
-                    temp = data.find("div",class_="BNeawe").text
-                    speak(f"Current {search} is {temp}")
+                    try:
+                        speak("which place' temperature would you like to know?")
+                        place = self.take_command().lower()
+                        search = "Temperature in " + place
+                        url = f'https://www.google.com/search?q={search}'
+                        r = requests.get(url)
+                        data = BeautifulSoup(r.text,"html.parser")
+                        temp = data.find("div",class_="BNeawe").text
+                        speak(f"Current {search} is {temp}")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "activate search mode" in self.query:
-                    speak("Plase tell me what do you want to search")
-                    how = self.take_command()
-                    max_results=1
-                    how_to = search_wikihow(how,max_results)
-                    assert len(how_to) == 1
-                    how_to[0].print()
-                    speak(how_to[0].summary)
+                    try:
+                        speak("Plase tell me what do you want to search")
+                        how = self.take_command()
+                        max_results=1
+                        how_to = search_wikihow(how,max_results)
+                        assert len(how_to) == 1
+                        how_to[0].print()
+                        speak(how_to[0].summary)
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "alarm" in self.query:
-                    speak('Please tell me the time to set the alarm. Example: 10:10 am')
-                    userResponse = self.take_command()
-                    userResponse = userResponse.replace('set alarm to ','')
-                    userResponse = userResponse.replace('.','')
-                    userResponse = userResponse.upper()
-                    alarm(userResponse)
+                    try:
+                        speak('Please tell me the time to set the alarm. Example: 10:10 am')
+                        userResponse = self.take_command()
+                        userResponse = userResponse.replace('set alarm to ','')
+                        userResponse = userResponse.replace('.','')
+                        userResponse = userResponse.upper()
+                        alarm(userResponse)
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "game" in self.query:
-                    speak('Okay.. I have the best game for you! The snake game! Would you like me to give you instructions?')
-                    userResponse = self.take_command().lower()
-                    if userResponse == 'yes':
-                        speak('Alright! You need to use w key to go up , a key to go left, d key to go right and s key to come down. Eat the apples you grow, if not you die! All the best')
-                        startGame()
-                        sys.exit()
-                    else :
-                        speak("Sorry couldn't understand you!")
+                    try:
+                        speak('Okay.. I have the best game for you! The snake game! Would you like me to give you instructions?')
+                        userResponse = self.take_command().lower()
+                        if userResponse == 'yes':
+                            speak('Alright! You need to use w key to go up , a key to go left, d key to go right and s key to come down. Eat the apples you grow, if not you die! All the best')
+                            startGame()
+                            sys.exit()
+                        else :
+                            speak("Sorry couldn't understand you!")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
         
                 elif "do some calculations" in self.query or "can you calculate" in self.query or "do some calculation" in self.query or "calculator" in self.query:
-                    r = sr.Recognizer()
-                    with sr.Microphone() as source:
-                        speak("What do you want to calculate?")
-                        r.adjust_for_ambient_noise(source)
-                        audio = r.listen(source)
-                        my_string = r.recognize_google(audio)
-                        print(my_string)
-                        if "cos" in my_string:
-                            #cos 10
-                            num = 0
-                            number = f'{num}'
-                            print(number)
-                            ans = cos(number)
-                            speak(ans)
-                        else:
+                    try:
+                        r = sr.Recognizer()
+                        with sr.Microphone() as source:
+                            speak("Hey, i can do basic calculations!")
+                            speak("What do you want to calculate?")
+                            my_string = self.take_command().lower()
+                            print(my_string)
                             def getOperator(opr):
                                 return{
                                     "+": add,
@@ -676,94 +744,162 @@ class MainThread(QThread):
                             def EvaluateExpression(op1,opr,op2):
                                 op1,op2 = int(op1), int(op2)
                                 return getOperator(opr)(op1,op2)
-                            speak("The answer is: ")
-                            speak(EvaluateExpression(*(my_string.split())))
+                            speak(f"The answer is: {EvaluateExpression(*(my_string.split()))} ")
+                    except Exception as e:
+                        print(e)
+                        speak("OOPS! Something went wrong")
+                
+                elif "who made you" in self.query or "who created you" in self.query:
+                    speak("I have been created by Aarti and Vishwa.")
+
+                elif "who am i" in self.query:
+                    speak("If you talk then definitely your human.")
+ 
+                elif "how did you come into world" in self.query:
+                    speak("Thanks to Aarti and Vishwa. Further It's a secret")
+ 
+                elif "who are you" in self.query:
+                    speak("I am your virtual assistant created by Aarti and Vishwa")
+ 
+                elif 'reason for you' in self.query:
+                    speak("I was created as a project by Aarti and Vishwa")
+ 
+                elif "where is" in self.query:
+                    self.query = self.query.replace("where is", "")
+                    location = self.query
+                    speak(f"User has asked to Locate {location}")
+                    path = try_finding_chrome_path()
+                    path = path.replace(os.sep,'/')
+                    path = f'{path} %s'
+                    webbrowser.get(path).open("https://www.google.nl/maps/place/"+ location + "")
+
+                elif "will you be my girlfriend" in self.query or "will you be my boyfriend" in self.query:  
+                    speak("I'm not sure about that, maybe you should give me some time to think")
+ 
+                elif "how are you" in self.query:
+                    speak("I'm fine, glad you asked me that")
+ 
+                elif "i love you" in self.query:
+                    speak("It's hard to understand to understand love")
 
                 elif "battery" in self.query or "how much power left" in self.query:
-                    battery = checkBattery()
-                    speak(f"Our system has {battery} percent battery")
+                    try:
+                        battery = checkBattery()
+                        speak(f"Our system has {battery} percent battery")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "check internet speed" in self.query or "speed test" in self.query or "internet speed" in self.query:
-                    st = speedtest.Speedtest()
-                    dl = round(st.download() / 1048576)
-                    up = round(st.upload() / 1048576)
-                    speak(f"The download speed is {dl} mbp s and upload speed is {up} mbp s")
+                    try:
+                        st = speedtest.Speedtest()
+                        dl = round(st.download() / 1048576)
+                        up = round(st.upload() / 1048576)
+                        speak(f"The download speed is {dl} mbp s and upload speed is {up} mbp s")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "increase volume" in self.query or "volume up" in self.query or "volume high" in self.query:
-                    pyautogui.press("volumeup")
+                    try:
+                        pyautogui.press("volumeup")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "decrease volume" in self.query or "volume down" in self.query or "volume low" in self.query:
-                    pyautogui.press("volumedown")
+                    try:
+                        pyautogui.press("volumedown")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "volume off" in self.query or "mute" in self.query:
-                    pyautogui.press("volumemute")
+                    try:
+                        pyautogui.press("volumemute")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "translate" in self.query:
-                    translateSentence()
-                    res = "yes"
-                    while res == "yes":
-                        speak("Do you want to translate something else?")
-                        res = self.take_command().lower()
-                        if "yes" in res:
-                            translateSentence()
-                        else:
-                            res = "no"
-                            break
+                    try:
+                        translateSentence()
+                        res = "yes"
+                        while res == "yes":
+                            speak("Do you want to translate something else?")
+                            res = self.take_command().lower()
+                            if "yes" in res:
+                                translateSentence()
+                            else:
+                                res = "no"
+                                break
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "download video" in self.query:
-                    speak("Provide me the youtube link...")
-                    root=tkinter.Tk()
-                    root.geometry("400x240")
-                    BE=ButtonEntry(root)    
-                    root.mainloop()
-                    url = resultForMsg
-                    speak("Downloading, please wait, this might take a few minutes")
-                    YouTube(url).streams.get_highest_resolution().download()
-                    speak("Download completed.")
+                    try:
+                        speak("Provide me the youtube link...")
+                        root=tkinter.Tk()
+                        root.geometry("400x240")
+                        BE=ButtonEntry(root)    
+                        root.mainloop()
+                        url = resultForMsg
+                        speak("Downloading, please wait, this might take a few minutes")
+                        YouTube(url).streams.get_highest_resolution().download()
+                        speak("Download completed.")
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 elif "search a file" in self.query or "open a file" in self.query:
-                    isFound = False
-                    root=tkinter.Tk()
-                    root.geometry("400x240")
-                    BE=ButtonEntry(root)    
-                    root.mainloop()
-                    search = resultForMsg
-                    drives = []
-                    bitmask = windll.kernel32.GetLogicalDrives()
-                    for letter in string.ascii_uppercase:
-                        if bitmask & 1:
-                            drives.append(letter)
-                            print(letter)
-                            if letter!="c" and letter!="C":
-                                listing1 = os.walk(letter+":/")
-                                if isFound == False:
-                                    print("Searching in "+letter+" drive")
-                                    for root, dir, files in listing1:
-                                        if search in files:
-                                            print(os.path.join(root,search))
-                                            os.startfile(os.path.join(root,search))
-                                            isFound = True
-                                            break
+                    try:
+                        isFound = False
+                        root=tkinter.Tk()
+                        root.geometry("400x240")
+                        BE=ButtonEntry(root)    
+                        root.mainloop()
+                        search = resultForMsg
+                        drives = []
+                        bitmask = windll.kernel32.GetLogicalDrives()
+                        for letter in string.ascii_uppercase:
+                            if bitmask & 1:
+                                drives.append(letter)
+                                print(letter)
+                                if letter!="c" and letter!="C":
+                                    listing1 = os.walk(letter+":/")
                                     if isFound == False:
-                                        print(search + " not found in "+letter+" drive")
-                        bitmask >>= 1
+                                        print("Searching in "+letter+" drive")
+                                        for root, dir, files in listing1:
+                                            if search in files:
+                                                print(os.path.join(root,search))
+                                                os.startfile(os.path.join(root,search))
+                                                isFound = True
+                                                break
+                                        if isFound == False:
+                                            print(search + " not found in "+letter+" drive")
+                            bitmask >>= 1
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
-                # elif "talk to are vah" in self.query or "talk to misty" in self.query or "change gender" in self.query or "bored talking to you" in self.query:
-                #     #print(gen)
-                #     g=0
-                #     g = gen
-                #     if g==0:
-                #         engine.setProperty('voice',voices[1].id)
-                #         speak("Changing Arva to Vishti")
-                #         gen=1
-                #     elif g==1:
-                #         engine.setProperty('voice',voices[0].id)
-                #         speak("Changing Vishti to Arva")
-                #         gen=0
+                elif "talk to are vah" in self.query or "talk to misty" in self.query or "change gender" in self.query or "bored talking to you" in self.query:
+                    global gen
+                    g = gen
+                    if g==0:
+                        engine.setProperty('voice',voices[1].id)
+                        speak("Okay, giving power to my partner. Arva Out Vishti In")
+                        gen=1
+                    elif g==1:
+                        engine.setProperty('voice',voices[0].id)
+                        speak("Okay, giving power to my partner. Vishti Out Arva In")
+                        gen=0
+                
+                elif "joke" in self.query:
+                    speak("Okay let me try to cheer you up. One funny joke coming right away")
+                    test_list = ["Man 1 - Why is prime minister not seen in morning? Man 2 - Because he is pm not a m","When a wife asked his husband to give her some space, the husband locked the wife outside the house","People ask me: Is google a man or woman? My simple answer is: its a woman because it wont let you finish your sentence without making a suggesion.","A man shows up late for work. The boss yells: You should have been here at 8:30! The man replies: Why? what happened at 8:30?","Man 1: Whats up? Man 2: Nothing much, converting oxygen into carbon dioxide. Man 1: How the hell you do that? Man 2: Breathing... dude","Teeth says to tongue: if i just press a little, you'll get cut. Tongue replies: if i misuse a single word, all 32 of you will come out.","Imagine that you're in the forest where there is a tiger in front of you and right about to eat you. What will you do? ....... Stop imagining stupid","Boss: Why are you late? Employee: There was a man who lost his 100 dollar bill. Boss: That's nice, you were helping him to look for it? Employee: No, I wan standing on it.","Mother: Why did you scire less in test? Johnny: Because of absence. Mother: You mean you were absent in class? Johnny: No, but the boy who sits next to me was absent.","Customer: Do you serve crabs? Waiter: Please have a sit sir, we serve everyone.","Teacher: Why are you late? John: Because of the sign. Teaacher: What sign? John: The one that says, school ahead, go slow","Teacher: you know you cant sleep in my class. Boy: i know, but maybe if you were just a little quiter, i could"]
+                    random_num = random.choice(test_list)
+                    speak (str(random_num))
+                    playsound('C://Users//HP//Desktop//Hackathon-final//VirtualAssistant//laugh.mp3')
 
                 elif "no" in self.query:
-                    speak("Thank you for using me, have a great day ahead...")                
-                    sys.exit()
+                    try:
+                        speak("Thank you for using me, have a great day ahead...")                
+                        sys.exit()
+                    except Exception as e:
+                        speak("OOPS! Something went wrong")
 
                 speak("Do you have any other work?")
 
